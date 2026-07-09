@@ -10,9 +10,9 @@
             <p>{{ post.content }}</p>
             <hr>
 
-            <h3>Comments ({{ comments.count }})</h3>
+            <h3>Comments ({{ post.comments.count }})</h3>
             {% for comment in comments %}
-                <div class="card mb-2">
+                <div class="card mb-2 shadow-sm">
                     <div class="card-body p-3">
                         <strong>{{ comment.user }}</strong>
                         <small class="text-muted">{{ comment.created_time }}</small>
@@ -20,20 +20,29 @@
                     </div>
                 </div>
             {% empty %}
-                <p>No comments yet.</p>
+                <p class="text-muted">No comments yet.</p>
             {% endfor %}
 
             <hr>
             <h4>Leave a Comment</h4>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             {% if user.is_authenticated %}
-                <form method="post">
+                <form method="post" action="{% url 'blog:post-detail' pk=post.id %}">
                     {% csrf_token %}
                     {{ form|crispy }}
                     <button type="submit" class="btn btn-primary">Submit Comment</button>
                 </form>
             {% else %}
                 <div class="alert alert-warning">
-                    You must be <a href="/admin/login/?next={{ request.path }}">logged in</a> to post comments.
+                    You must be logged in to post comments.
                 </div>
             {% endif %}
         </div>
